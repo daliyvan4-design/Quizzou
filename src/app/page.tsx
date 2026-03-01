@@ -15,6 +15,15 @@ export default function Home() {
     try {
       setIsLoggingIn(true);
 
+      const apiKey = auth.app.options.apiKey;
+      console.log("Auto-diagnostic Auth...");
+
+      if (!apiKey || apiKey.includes("Placeholder")) {
+        alert("⚠️ Erreur de configuration : Le site utilise une clé de secours. Vérifiez vos variables d'environnement NEXT_PUBLIC_ sur Vercel !");
+        setIsLoggingIn(false);
+        return;
+      }
+
       // Log pour vérifier que les variables sont bien chargées côté client
       console.log("Tentative de connexion...");
       console.log("Firebase App Name:", auth.app.name);
