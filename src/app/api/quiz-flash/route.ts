@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
-import { adminFirestore } from "@/lib/firebase/admin";
+import { cookies } from "next/headers";
+import { adminAuth, adminFirestore } from "@/lib/firebase/admin";
 
 export async function POST(req: NextRequest) {
     try {
+        const cookieStore = await cookies();
+        const session = cookieStore.get("session")?.value;
+
+        if (!session) {
+            return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
+        }
+
+        const decodedToken = await adminAuth.verifySessionCookie(session);
+        const userId = decodedToken.uid;
+
         const body = await req.json();
         const { topic } = body;
 
@@ -17,7 +28,7 @@ export async function POST(req: NextRequest) {
 
         const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY });
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             contents: `Tu es un professeur expert d'université. Génère un quiz interactif très complet de niveau avancé sur le thème ou sujet suivant : "${topic}".
         Je veux au minimum entre 5 et 10 questions. Veille à ce que les questions évaluent la compréhension profonde, le raisonnement et l'analyse de ce thème.
         IMPORTANT: Le quiz en entier (titre, questions, options, explications, tags) DOIT ABSOLUMENT T'ÊTRE RÉDIGÉ EN FRANÇAIS.
@@ -59,6 +70,7 @@ export async function POST(req: NextRequest) {
         const docRef = adminFirestore.collection('quizzes').doc(quizId);
         await docRef.set({
             ...quizData,
+            userId,
             createdAt: new Date().toISOString(),
             sourceType: "flash"
         });

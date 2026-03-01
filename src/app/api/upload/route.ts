@@ -67,14 +67,14 @@ export async function POST(request: Request) {
             createdAt: new Date()
         });
 
-        // 5. Utiliser Gemini 3.1 Pro pour analyser le texte
+        // 5. Utiliser Gemini 1.5 Flash pour analyser le texte
         if (!process.env.GOOGLE_GEMINI_API_KEY) {
             return NextResponse.json({ error: 'Clé API Gemini introuvable.' }, { status: 500 });
         }
 
         const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY });
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             contents: `Tu es un professeur expert d'université. Analyse scrupuleusement le document texte fourni à la fin et génère un quiz interactif très complet de niveau avancé.
         Je veux au minimum entre 10 et 15 questions. Veille à ce que les questions ne soient pas que de la simple récitation, mais évaluent la compréhension profonde, le raisonnement et l'analyse des concepts abordés.
         IMPORTANT: Le quiz en entier (titre, questions, options, explications, tags) DOIT ABSOLUMENT T'ÊTRE RÉDIGÉ EN FRANÇAIS, même si le texte source est dans une autre langue.

@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
-import { adminFirestore } from "@/lib/firebase/admin";
+import { cookies } from "next/headers";
+import { adminAuth, adminFirestore } from "@/lib/firebase/admin";
 
 export async function POST(req: NextRequest) {
     try {
+        const cookieStore = await cookies();
+        const session = cookieStore.get("session")?.value;
+
+        if (!session) {
+            return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
+        }
+
+        const decodedToken = await adminAuth.verifySessionCookie(session);
+        const userId = decodedToken.uid;
+
         const { quizId } = await req.json();
 
         if (!quizId) {
@@ -17,6 +28,12 @@ export async function POST(req: NextRequest) {
         }
 
         const data = quizDoc.data();
+
+        // Vérification de sécurité : l'utilisateur est-il le propriétaire du quiz ?
+        if (data?.userId !== userId) {
+            return NextResponse.json({ error: "Accès refusé à ce document." }, { status: 403 });
+        }
+
         const textToSummarize = data?.text || "";
 
         if (!textToSummarize) {
@@ -34,7 +51,7 @@ export async function POST(req: NextRequest) {
 
         const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY });
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             contents: `Tu es un expert en éducation. Ton but est de créer un résumé structuré, clair et ultra-pertinent du texte suivant.
         Utilise des titres (Markdown), des puces, et mets en gras les concepts clés.
         Rédige le tout en FRANÇAIS.
@@ -42,15 +59,12 @@ export async function POST(req: NextRequest) {
         Voici le contenu:
         ${(textToSummarize || "").substring(0, 80000)}`,
             config: {
-                // Pas besoin de format JSON ici, juste du Markdown
                 responseMimeType: "text/plain",
             }
         });
 
         const summary = response.text || "Impossible de générer le résumé.";
 
-        // On peut sauvegarder le résumé si on veut, ou juste le renvoyer
-        // Ici on le renvoie directement
         return NextResponse.json({ summary });
 
     } catch (err: any) {
