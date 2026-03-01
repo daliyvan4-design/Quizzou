@@ -33,3 +33,4 @@ export const app = getClientApp();
 export const auth = getAuth(app);
 export const firestore = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
