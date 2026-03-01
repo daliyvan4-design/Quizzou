@@ -19,10 +19,17 @@ function getAdminApp() {
         private_key: privateKey,
     };
 
-    if (projectId && clientEmail && privateKey) {
-        return initializeApp({
-            credential: cert(config as any)
-        });
+    // Vérification stricte du format de la clé privée pour éviter l'erreur "Invalid PEM formatted message"
+    const isKeyValid = privateKey && privateKey.includes('-----BEGIN PRIVATE KEY-----');
+
+    if (projectId && clientEmail && isKeyValid) {
+        try {
+            return initializeApp({
+                credential: cert(config as any)
+            });
+        } catch (error) {
+            console.warn("Firebase Admin: Échec de l'initialisation avec cert(), bascule vers application de secours.", error);
+        }
     }
 
     // Fallback minimal pour éviter le crash fatal au moment du build (quand les env vars peuvent manquer)
