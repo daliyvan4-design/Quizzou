@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e63746",
+                        "background-light": "#f8f9fa",
+                        "background-dark": "#211112",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="bg-primary p-2 rounded-lg text-white">
+<span class="material-symbols-outlined block">auto_stories</span>
+</div>
+<h1 class="font-bold text-xl tracking-tight text-primary">StudySaaS</h1>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-semibold" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Tableau de bord</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>Mes Documents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Statistiques</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">quiz</span>
+<span>Quiz Flash</span>
+</a>
+</nav>
+<div class="p-4 mt-auto">
+<div class="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">workspace_premium</span>
+</div>
+<div>
+<p class="text-xs font-bold uppercase tracking-wider text-slate-500">Mode Pro</p>
+<p class="text-sm font-medium">Illimité</p>
+</div>
+</div>
+<button class="w-full py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/20">Améliorer</button>
+</div>
+<div class="mt-6 flex items-center gap-3 px-2">
+<img class="w-10 h-10 rounded-full border-2 border-primary/20 object-cover" data-alt="Photo de profil utilisateur" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVGhFEKcBCmirBr9PXz9E_ZbeLHO-FQ71b2jwcAR8sDYWr2ejOb8YXPOFV3lqaxjGfecqkEvlKm9CLDBDJFRkSHW3CVEgWs_RihHOJtqfRKcPy6t4OJqUFwV4qkZ-DkAmr0uddF0ctqNf8oLQC6bBYyk5bhZ1wP7NAO7vPJcnyUNp6eCbOgyPHer7BK814ebZbIYw13PwLGHGKHUgNnRM0SM8lLNDj61YJmgwgMPT0SB6wJVu224bCAnUcBv8qwkCmDURLq5Sltoaa"/>
+<div class="flex-1">
+<p class="text-sm font-bold">Thomas Durand</p>
+<p class="text-xs text-slate-500">Étudiant</p>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark scroll-smooth">
+<!-- Top Header -->
+<header class="sticky top-0 z-10 glass px-8 py-4 flex items-center justify-between">
+<div>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">Bonjour Thomas, prêt à étudier ?</h2>
+<p class="text-slate-500 text-sm">Transformez vos documents en sessions d'étude intelligentes.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/50 text-sm w-64" placeholder="Rechercher un document..." type="text"/>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 shadow-sm">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-8 py-10">
+<!-- Drag and Drop Section -->
+<section class="mb-12">
+<div class="relative group">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary to-orange-500 rounded-3xl blur opacity-10 group-hover:opacity-20 transition duration-1000 group-hover:duration-200"></div>
+<div class="relative glass rounded-3xl border-2 border-dashed border-primary/30 p-12 flex flex-col items-center text-center cursor-pointer hover:border-primary transition-all shadow-xl shadow-slate-200/50">
+<div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-4xl text-primary animate-bounce">cloud_upload</span>
+</div>
+<h3 class="text-xl font-bold mb-2">Déposez votre document ici</h3>
+<p class="text-slate-500 mb-8 max-w-md">Format PDF, DOCX supportés. Notre IA analysera le contenu pour générer votre session d'étude personnalisée.</p>
+<div class="flex gap-4">
+<button class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-bold transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/25">
+                                    Parcourir les fichiers
+                                </button>
+<button class="bg-white dark:bg-slate-800 px-8 py-3 rounded-xl font-bold border border-slate-200 dark:border-slate-700 transition-all hover:bg-slate-50">
+                                    Lien URL
+                                </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Documents Section -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-xl font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history</span>
+                            Documents Récents
+                        </h3>
+<a class="text-primary font-semibold text-sm hover:underline" href="#">Voir tout</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Document Card 1 -->
+<div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow group border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">description</span>
+</div>
+<div class="relative w-16 h-16">
+<svg class="w-full h-full" viewbox="0 0 36 36">
+<path class="stroke-slate-100 dark:stroke-slate-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="3"></path>
+<path class="stroke-primary progress-ring__circle" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="75, 100" stroke-linecap="round" stroke-width="3"></path>
+<text class="text-[8px] font-bold fill-slate-900 dark:fill-white" text-anchor="middle" x="18" y="20.35">75%</text>
+</svg>
+</div>
+</div>
+<h4 class="font-bold text-lg mb-1 group-hover:text-primary transition-colors">Cours de Droit Civil</h4>
+<p class="text-slate-500 text-xs mb-4">Analysé le 12 Oct 2023 • 42 pages</p>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-700">
+<span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-bold uppercase px-2 py-1 rounded">Maîtrisé</span>
+<button class="text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Document Card 2 -->
+<div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow group border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">menu_book</span>
+</div>
+<div class="relative w-16 h-16">
+<svg class="w-full h-full" viewbox="0 0 36 36">
+<path class="stroke-slate-100 dark:stroke-slate-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="3"></path>
+<path class="stroke-primary progress-ring__circle" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="32, 100" stroke-linecap="round" stroke-width="3"></path>
+<text class="text-[8px] font-bold fill-slate-900 dark:fill-white" text-anchor="middle" x="18" y="20.35">32%</text>
+</svg>
+</div>
+</div>
+<h4 class="font-bold text-lg mb-1 group-hover:text-primary transition-colors">Macroéconomie S1</h4>
+<p class="text-slate-500 text-xs mb-4">Analysé le 10 Oct 2023 • 128 pages</p>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-700">
+<span class="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-[10px] font-bold uppercase px-2 py-1 rounded">En cours</span>
+<button class="text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Document Card 3 -->
+<div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow group border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-amber-50 dark:bg-amber-900/20 text-amber-600 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">psychology</span>
+</div>
+<div class="relative w-16 h-16">
+<svg class="w-full h-full" viewbox="0 0 36 36">
+<path class="stroke-slate-100 dark:stroke-slate-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="3"></path>
+<path class="stroke-primary progress-ring__circle" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="92, 100" stroke-linecap="round" stroke-width="3"></path>
+<text class="text-[8px] font-bold fill-slate-900 dark:fill-white" text-anchor="middle" x="18" y="20.35">92%</text>
+</svg>
+</div>
+</div>
+<h4 class="font-bold text-lg mb-1 group-hover:text-primary transition-colors">Neurosciences Appliquées</h4>
+<p class="text-slate-500 text-xs mb-4">Analysé le 05 Oct 2023 • 15 pages</p>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-700">
+<span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-bold uppercase px-2 py-1 rounded">Excellant</span>
+<button class="text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Actions Section -->
+<section class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-6 text-white overflow-hidden relative">
+<div class="relative z-10">
+<h4 class="text-xl font-bold mb-2">Prêt pour un test ?</h4>
+<p class="text-slate-300 text-sm mb-4">Générez un quiz basé sur vos documents récents pour valider vos acquis.</p>
+<button class="bg-white text-slate-900 px-6 py-2 rounded-lg font-bold text-sm">Lancer un Quiz</button>
+</div>
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-9xl opacity-10 rotate-12">assignment_turned_in</span>
+</div>
+<div class="bg-gradient-to-br from-primary to-orange-500 rounded-2xl p-6 text-white overflow-hidden relative">
+<div class="relative z-10">
+<h4 class="text-xl font-bold mb-2">Résumé IA</h4>
+<p class="text-slate-100 text-sm mb-4">Obtenez un résumé concis des points clés de votre cours de Droit Civil.</p>
+<button class="bg-white/20 backdrop-blur-md text-white px-6 py-2 rounded-lg font-bold text-sm border border-white/30">Générer le résumé</button>
+</div>
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-9xl opacity-20 -rotate-12">auto_awesome</span>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>
