@@ -10,7 +10,26 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// Sécurité pour le build : n'initialiser que si la clé API est présente
+const getClientApp = () => {
+    if (getApps().length > 0) return getApps()[0];
+
+    // Les clés Firebase commencent par AIzaSy. Si on ne met pas ce préfixe, 
+    // le SDK jette une erreur "invalid-api-key" au moment de l'initialisation.
+    if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "undefined" || firebaseConfig.apiKey === "") {
+        console.warn("Firebase Client: Clé API manquante ou invalide au build.");
+        return initializeApp({
+            apiKey: "AIzaSyBuildPlaceholderKey_0000",
+            projectId: "quizzou-build-only",
+            authDomain: "quizzou.firebaseapp.com",
+            appId: "1:000000000000:web:000000000000"
+        });
+    }
+
+    return initializeApp(firebaseConfig);
+};
+
+export const app = getClientApp();
 export const auth = getAuth(app);
 export const firestore = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
