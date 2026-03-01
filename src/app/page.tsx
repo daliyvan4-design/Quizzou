@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, browserPopupRedirectResolver } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase/config";
 
 export default function Home() {
@@ -14,7 +14,12 @@ export default function Home() {
   const handleLogin = async () => {
     try {
       setIsLoggingIn(true);
-      const result = await signInWithPopup(auth, googleProvider);
+
+      // Log pour vérifier que les variables sont bien chargées côté client
+      console.log("Tentative de connexion...");
+      console.log("Firebase App Name:", auth.app.name);
+
+      const result = await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
       const idToken = await result.user.getIdToken();
 
       const res = await fetch("/api/auth/session", {
@@ -100,63 +105,36 @@ export default function Home() {
             <p className="text-black max-w-2xl mx-auto italic font-medium">Une approche scientifique pour une mémorisation durable et sans effort.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="glass-card bg-white border-2 border-primary p-8 rounded-3xl group hover:shadow-[0_0_15px_rgba(230,55,70,0.5)] transition-all duration-300">
-              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform shadow-md">
-                <span className="material-symbols-outlined text-3xl">psychology</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-black">Analyse Profonde par IA</h3>
-              <p className="text-black font-medium leading-relaxed">
-                Nos algorithmes extraient intelligemment les concepts clés et les nuances de vos documents pour créer des questions pertinentes.
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="flex flex-col gap-6 p-8 rounded-3xl border-2 border-primary hover:bg-primary/5 transition-colors">
+              <span className="material-symbols-outlined text-primary text-5xl">quiz</span>
+              <h3 className="text-xl font-black text-black">Rappel Actif</h3>
+              <p className="text-sm text-black leading-relaxed font-medium">Forcer votre cerveau à récupérer l'information renforce les connexions neuronales bien plus que la simple relecture.</p>
             </div>
-            <div className="glass-card bg-white border-2 border-primary p-8 rounded-3xl group hover:shadow-[0_0_15px_rgba(230,55,70,0.5)] transition-all duration-300">
-              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform shadow-md">
-                <span className="material-symbols-outlined text-3xl">interactive_space</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-black">Apprentissage Actif</h3>
-              <p className="text-black font-medium leading-relaxed">
-                Engagement maximal via des quiz interactifs personnalisés. Transformez la lecture passive en rappel actif.
-              </p>
+            <div className="flex flex-col gap-6 p-8 rounded-3xl border-2 border-primary hover:bg-primary/5 transition-colors">
+              <span className="material-symbols-outlined text-primary text-5xl">psychology</span>
+              <h3 className="text-xl font-black text-black">Correction Instantanée</h3>
+              <p className="text-sm text-black leading-relaxed font-medium">Savoir immédiatement pourquoi vous avez tort permet d'ajuster votre compréhension en temps réel.</p>
             </div>
-            <div className="glass-card bg-white border-2 border-primary p-8 rounded-3xl group hover:shadow-[0_0_15px_rgba(230,55,70,0.5)] transition-all duration-300">
-              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform shadow-md">
-                <span className="material-symbols-outlined text-3xl">trending_up</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-black">Suivi de Rétention</h3>
-              <p className="text-black font-medium leading-relaxed">
-                Algorithmes de répétition espacée basés sur la courbe de l'oubli pour garantir une mémorisation sur le long terme.
-              </p>
+            <div className="flex flex-col gap-6 p-8 rounded-3xl border-2 border-primary hover:bg-primary/5 transition-colors">
+              <span className="material-symbols-outlined text-primary text-5xl">history_edu</span>
+              <h3 className="text-xl font-black text-black">Synthèse IA</h3>
+              <p className="text-sm text-black leading-relaxed font-medium">L'IA extrait les concepts clés de vos documents pour vous concentrer uniquement sur l'essentiel.</p>
             </div>
-          </div>
-        </section>
-
-        <section className="bg-primary mx-6 mb-12 rounded-[2.5rem] py-20 px-6 border-4 border-primary overflow-hidden relative shadow-2xl">
-          <div className="max-w-4xl mx-auto text-center relative z-10">
-            <h2 className="text-4xl lg:text-5xl font-black text-white mb-6 leading-tight">
-              Prêt à transformer votre manière d'apprendre ?
-            </h2>
-            <p className="text-white text-lg mb-10 max-w-xl mx-auto font-medium">
-              Rejoignez des milliers d'étudiants et professionnels qui utilisent Quizzou pour exceller dans leurs domaines.
-            </p>
-            <Link href="/features" className="bg-white text-primary border-2 border-white px-10 py-4 rounded-xl text-lg font-bold shadow-xl hover:bg-transparent hover:text-white transition-all inline-block">
-              Voir les fonctionnalités
-            </Link>
           </div>
         </section>
       </main>
 
-      <footer className="py-12 px-6 border-t-2 border-primary bg-white text-black text-center md:text-left">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+      <footer className="mt-auto py-12 border-t-2 border-primary">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center">
-            <img src="/logo.png" alt="Quizzou Logo" className="h-16 w-auto object-contain" />
+            <img src="/logo.png" alt="Quizzou Logo" className="h-12 w-auto object-contain" />
           </div>
-          <div className="flex flex-wrap justify-center gap-8 font-medium">
-            <Link className="text-sm hover:text-primary transition-colors" href="/privacy">Confidentialité</Link>
-            <Link className="text-sm hover:text-primary transition-colors" href="/terms">Conditions</Link>
-            <Link className="text-sm hover:text-primary transition-colors" href="/contact">Contact</Link>
+          <div className="flex gap-8 text-sm font-bold">
+            <Link href="/privacy" className="hover:text-primary transition-colors">Confidentialité</Link>
+            <Link href="/terms" className="hover:text-primary transition-colors">C.G.U</Link>
           </div>
-          <p className="text-sm font-medium">© 2026 Xcompany all right reserved.</p>
+          <p className="text-sm font-bold text-slate-500">© 2026 Xcompany all right reserved.</p>
         </div>
       </footer>
     </div>
