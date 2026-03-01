@@ -2,12 +2,20 @@ import { initializeApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+function unquote(val: string | undefined) {
+    if (!val) return undefined;
+    if (val.startsWith('"') && val.endsWith('"')) {
+        return val.substring(1, val.length - 1);
+    }
+    return val;
+}
+
 const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    apiKey: unquote(process.env.NEXT_PUBLIC_FIREBASE_API_KEY),
+    authDomain: unquote(process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN),
+    projectId: unquote(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID),
+    messagingSenderId: unquote(process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID),
+    appId: unquote(process.env.NEXT_PUBLIC_FIREBASE_APP_ID),
 };
 
 // Sécurité pour le build : n'initialiser que si la clé API est présente

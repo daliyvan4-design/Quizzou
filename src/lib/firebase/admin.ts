@@ -4,7 +4,24 @@ import { getFirestore } from 'firebase-admin/firestore';
 
 const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+function formatPrivateKey(key: string | undefined) {
+    if (!key) return undefined;
+
+    let sanitizedKey = key;
+
+    // 1. Retirer d'éventuels guillemets entourant la clé (souvent ajouté par erreur sur Vercel)
+    if (sanitizedKey.startsWith('"') && sanitizedKey.endsWith('"')) {
+        sanitizedKey = sanitizedKey.substring(1, sanitizedKey.length - 1);
+    }
+
+    // 2. Remplacer les \n par de vrais sauts de ligne
+    sanitizedKey = sanitizedKey.replace(/\\n/g, '\n');
+
+    return sanitizedKey;
+}
+
+const privateKey = formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY);
 
 function getAdminApp() {
     if (getApps().length > 0) return getApp();
