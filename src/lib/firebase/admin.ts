@@ -8,16 +8,27 @@ const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 function formatPrivateKey(key: string | undefined) {
     if (!key) return undefined;
 
+    try {
+        const parsed = JSON.parse(key);
+        if (parsed.private_key) return parsed.private_key;
+        if (typeof parsed === 'string') key = parsed;
+    } catch (e) { }
+
     let sanitizedKey = key;
 
-    // 1. Retirer d'éventuels guillemets entourant la clé (souvent ajouté par erreur sur Vercel)
-    if (sanitizedKey.startsWith('"') && sanitizedKey.endsWith('"')) {
-        sanitizedKey = sanitizedKey.substring(1, sanitizedKey.length - 1);
-    }
+    // Fix universel : re-construire un certificat PEM parfait à partir de n'importe quel formattage (espaces, \n, string json...)
+    if (sanitizedKey.includes('-----BEGIN PRIVATE KEY-----')) {
+        let body = sanitizedKey
+            .replace(/\\n/g, '')
+            .replace('-----BEGIN PRIVATE KEY-----', '')
+            .replace('-----END PRIVATE KEY-----', '')
+            .replace(/["']/g, '') // retire les guillemets perdus
+            .replace(/\s+/g, ''); // retire tous les espaces/sauts de ligne
 
-    // 2. Remplacer les \n par de vrais sauts de ligne
-    sanitizedKey = sanitizedKey.replace(/\\n/g, '\n');
-    sanitizedKey = sanitizedKey.split(String.raw`\n`).join('\n');
+        // Découper le base64 en lignes de 64 caractères (standard PEM)
+        const keyLines = body.match(/.{1,64}/g)?.join('\n') || body;
+        sanitizedKey = `-----BEGIN PRIVATE KEY-----\n${keyLines}\n-----END PRIVATE KEY-----\n`;
+    }
 
     return sanitizedKey;
 }
