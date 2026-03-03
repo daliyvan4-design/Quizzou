@@ -40,7 +40,9 @@ export default function Home() {
       if (res.ok) {
         router.push("/dashboard");
       } else {
-        console.error("Session creation failed");
+        const errorData = await res.json();
+        console.error("Session creation failed", errorData);
+        alert(`Erreur création session: ${errorData.error || "Inconnue"}\nVérifiez les variables FIREBASE_ADMIN sur Vercel.`);
         setIsLoggingIn(false);
       }
     } catch (error) {
