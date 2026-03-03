@@ -10,6 +10,7 @@ import { auth, googleProvider } from "@/lib/firebase/config";
 export default function Home() {
   const router = useRouter();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogin = async () => {
     try {
@@ -61,15 +62,37 @@ export default function Home() {
             <img src="/logo.png" alt="Quizzou Logo" className="h-16 md:h-20 w-auto object-contain" />
           </div>
           <nav className="hidden md:flex items-center gap-8">
-            <Link className="text-sm font-medium hover:text-primary transition-colors" href="/features">Fonctionnalités</Link>
-            <Link className="text-sm font-medium hover:text-primary transition-colors" href="/pricing">Tarifs</Link>
-            <Link className="text-sm font-medium hover:text-primary transition-colors" href="/contact">Contact</Link>
+            <Link className="text-sm font-bold hover:text-primary transition-colors" href="/features">Fonctionnalités</Link>
+            <Link className="text-sm font-bold hover:text-primary transition-colors" href="/pricing">Tarifs</Link>
+            <Link className="text-sm font-bold hover:text-primary transition-colors" href="/contact">Contact</Link>
           </nav>
-          <button onClick={handleLogin} disabled={isLoggingIn} className="flex items-center gap-2 bg-primary text-white border-2 border-primary px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:bg-white hover:text-primary transition-all hover:scale-105 active:scale-95 disabled:opacity-50">
-            {isLoggingIn ? "Patientez..." : "Se connecter"}
-          </button>
+          <div className="flex items-center gap-4">
+            <button onClick={handleLogin} disabled={isLoggingIn} className="hidden md:flex items-center gap-2 bg-primary text-white border-2 border-primary px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:bg-white hover:text-primary transition-all hover:scale-105 active:scale-95 disabled:opacity-50">
+              {isLoggingIn ? "Patientez..." : "Se connecter"}
+            </button>
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-primary p-2">
+              <span className="material-symbols-outlined text-3xl">menu</span>
+            </button>
+          </div>
         </div>
       </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[60] bg-white flex flex-col pt-24 px-6 md:hidden">
+          <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-6 right-6 text-primary p-2">
+            <span className="material-symbols-outlined text-3xl">close</span>
+          </button>
+          <nav className="flex flex-col gap-6 items-center text-center w-full mb-8">
+            <Link onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-black text-black hover:text-primary transition-colors" href="/features">Fonctionnalités</Link>
+            <Link onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-black text-black hover:text-primary transition-colors" href="/pricing">Tarifs</Link>
+            <Link onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-black text-black hover:text-primary transition-colors" href="/contact">Contact</Link>
+          </nav>
+          <button onClick={() => { setIsMobileMenuOpen(false); handleLogin(); }} disabled={isLoggingIn} className="flex justify-center items-center gap-2 bg-primary text-white border-2 border-primary px-8 py-4 rounded-xl text-lg font-bold shadow-lg w-full transition-all active:scale-95 disabled:opacity-50">
+            {isLoggingIn ? "Patientez..." : "Se connecter avec Google"}
+          </button>
+        </div>
+      )}
 
       <main className="flex-grow pt-32">
         <section className="opacity-0 animate-fade-in-up max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-32">
