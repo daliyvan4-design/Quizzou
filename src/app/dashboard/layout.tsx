@@ -68,10 +68,6 @@ export default function DashboardLayout({
                         <span className="material-symbols-outlined text-primary">quiz</span>
                         <span>Quiz Flash</span>
                     </Link>
-                    <Link href="/dashboard/admin" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-black font-bold border-2 border-transparent hover:border-primary transition-colors hover:text-primary mt-8 bg-slate-50">
-                        <span className="material-symbols-outlined text-primary">shield</span>
-                        <span>Backend (Mails)</span>
-                    </Link>
                 </nav>
 
                 <div className="p-4 mt-auto border-t-2 border-primary">

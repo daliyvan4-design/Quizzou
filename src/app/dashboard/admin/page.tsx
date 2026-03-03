@@ -36,13 +36,32 @@ export default function AdminUsersPage() {
 
     return (
         <div className="max-w-6xl mx-auto px-6 md:px-8 py-8 md:py-10 bg-white min-h-[80vh]">
-            <div className="flex flex-col md:flex-row items-center justify-between mb-8">
+            <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
                 <h1 className="text-3xl font-black text-black flex items-center gap-3">
                     <span className="material-symbols-outlined text-primary text-4xl">admin_panel_settings</span>
                     Administration
                 </h1>
-                <div className="bg-primary/5 text-primary font-bold px-4 py-2 rounded-xl text-sm border border-primary/20">
-                    Total: {users.length} Utilisateurs
+                <div className="flex items-center gap-4">
+                    <div className="bg-primary/5 text-primary font-bold px-4 py-2 rounded-xl text-sm border border-primary/20">
+                        Total: {users.length} Utilisateurs
+                    </div>
+                    <button
+                        onClick={() => {
+                            const csvContent = "data:text/csv;charset=utf-8,"
+                                + "Nom Complet,Adresse Mail,Date d'inscription\n"
+                                + users.map(u => `"${u.name}","${u.email}","${u.createdAt}"`).join("\n");
+                            const encodedUri = encodeURI(csvContent);
+                            const link = document.createElement("a");
+                            link.setAttribute("href", encodedUri);
+                            link.setAttribute("download", "quizzou_users.csv");
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }}
+                        className="bg-primary text-white border-2 border-primary px-4 py-2 rounded-xl text-sm font-bold shadow-lg flex items-center gap-2 hover:bg-white hover:text-primary transition-all active:scale-95">
+                        <span className="material-symbols-outlined text-sm">download</span>
+                        Export CSV
+                    </button>
                 </div>
             </div>
 
