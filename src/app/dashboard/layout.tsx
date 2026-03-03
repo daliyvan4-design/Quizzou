@@ -80,7 +80,7 @@ export default function DashboardLayout({
                         />
                         <div className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
                             <p className="text-sm font-black text-black text-ellipsis overflow-hidden">{user?.displayName || 'Utilisateur'}</p>
-                            <p className="text-xs font-bold text-primary">Étudiant</p>
+                            <Link href="/dashboard/admin" className="text-xs font-bold text-primary hover:underline">Étudiant</Link>
                         </div>
                         <button onClick={handleSignOut} className="text-primary hover:text-black transition-colors" title="Déconnexion">
                             <span className="material-symbols-outlined text-2xl">logout</span>

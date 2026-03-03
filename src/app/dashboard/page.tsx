@@ -45,7 +45,7 @@ function DashboardContent() {
                     quizzes.push({
                         id: doc.id,
                         title: data.title || "Quiz Sans Titre",
-                        createdAt: data.createdAt ? new Date(data.createdAt).getTime() : Date.now(),
+                        createdAt: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : Date.now(),
                     });
                 });
 

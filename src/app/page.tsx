@@ -48,8 +48,12 @@ export default function Home() {
       }
     } catch (error: any) {
       console.error("Firebase Login Error", error);
-      const currentDomain = typeof window !== "undefined" ? window.location.hostname : "Inconnu";
-      alert(`Erreur de connexion détaillée: ${error?.message || error || "Erreur inconnue"}\n\n👉 Vous devez aller dans Firebase > Authentication > Settings > Authorized Domains et ajouter EXACTEMENT ce texte : \n${currentDomain}`);
+      if (error?.code === "auth/unauthorized-domain") {
+        const currentDomain = typeof window !== "undefined" ? window.location.hostname : "Inconnu";
+        alert(`Erreur de domaine non autorisé.\n\n👉 Vous devez aller dans Firebase > Authentication > Settings > Authorized Domains et ajouter : \n${currentDomain}`);
+      } else {
+        alert(`Erreur de connexion: ${error?.message || "Une erreur inconnue est survenue."}`);
+      }
       setIsLoggingIn(false);
     }
   };
