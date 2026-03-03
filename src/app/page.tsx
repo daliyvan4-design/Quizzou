@@ -47,7 +47,8 @@ export default function Home() {
       }
     } catch (error: any) {
       console.error("Firebase Login Error", error);
-      alert(`Erreur de connexion détaillée: ${error?.message || error || "Erreur inconnue"}`);
+      const currentDomain = typeof window !== "undefined" ? window.location.hostname : "Inconnu";
+      alert(`Erreur de connexion détaillée: ${error?.message || error || "Erreur inconnue"}\n\n👉 Vous devez aller dans Firebase > Authentication > Settings > Authorized Domains et ajouter EXACTEMENT ce texte : \n${currentDomain}`);
       setIsLoggingIn(false);
     }
   };
