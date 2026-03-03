@@ -17,6 +17,7 @@ function formatPrivateKey(key: string | undefined) {
 
     // 2. Remplacer les \n par de vrais sauts de ligne
     sanitizedKey = sanitizedKey.replace(/\\n/g, '\n');
+    sanitizedKey = sanitizedKey.split(String.raw`\n`).join('\n');
 
     return sanitizedKey;
 }
