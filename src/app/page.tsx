@@ -45,8 +45,9 @@ export default function Home() {
         alert(`Erreur création session: ${errorData.error || "Inconnue"}\nDebug: ${errorData.debug}\nVérifiez les variables FIREBASE_ADMIN sur Vercel.`);
         setIsLoggingIn(false);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Firebase Login Error", error);
+      alert(`Erreur de connexion détaillée: ${error?.message || error || "Erreur inconnue"}`);
       setIsLoggingIn(false);
     }
   };
