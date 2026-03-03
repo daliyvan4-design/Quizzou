@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
-import { firestore } from "@/lib/firebase/config";
+import { collection, query, getDocs, where } from "firebase/firestore";
+import { firestore, app } from "@/lib/firebase/config";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 interface RecentQuiz {
     id: string;
@@ -31,9 +32,12 @@ function DashboardContent() {
     const filterQuery = searchParams.get('q')?.toLowerCase() || "";
 
     useEffect(() => {
-        const fetchRecentQuizzes = async () => {
+        const fetchRecentQuizzes = async (uid: string) => {
             try {
-                const q = query(collection(firestore, "quizzes"), orderBy("createdAt", "desc"), limit(6));
+                const q = query(
+                    collection(firestore, "quizzes"),
+                    where("userId", "==", uid)
+                );
                 const querySnapshot = await getDocs(q);
                 const quizzes: RecentQuiz[] = [];
                 querySnapshot.forEach((doc) => {
@@ -44,14 +48,27 @@ function DashboardContent() {
                         createdAt: data.createdAt ? new Date(data.createdAt).getTime() : Date.now(),
                     });
                 });
-                setRecentQuizzes(quizzes);
+
+                // On trie côté client pour éviter d'exiger un index composé Firebase
+                quizzes.sort((a, b) => Number(b.createdAt) - Number(a.createdAt));
+
+                setRecentQuizzes(quizzes.slice(0, 6));
             } catch (e) {
                 console.error("Erreur de chargement des récents:", e);
             } finally {
                 setLoadingQuizzes(false);
             }
         };
-        fetchRecentQuizzes();
+
+        const auth = getAuth(app);
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchRecentQuizzes(user.uid);
+            } else {
+                setLoadingQuizzes(false);
+            }
+        });
+        return () => unsubscribe();
     }, []);
 
     const handleDrop = async (e: any) => {

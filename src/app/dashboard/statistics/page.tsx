@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { collection, query, getDocs } from "firebase/firestore";
-import { firestore } from "@/lib/firebase/config";
+import { collection, query, getDocs, where } from "firebase/firestore";
+import { firestore, app } from "@/lib/firebase/config";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
@@ -14,9 +15,12 @@ export default function StatisticsPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchQuizzes = async () => {
+        const fetchQuizzes = async (uid: string) => {
             try {
-                const q = query(collection(firestore, "quizzes"));
+                const q = query(
+                    collection(firestore, "quizzes"),
+                    where("userId", "==", uid)
+                );
                 const querySnapshot = await getDocs(q);
 
                 let quizCount = 0;
@@ -60,7 +64,16 @@ export default function StatisticsPage() {
             }
         };
 
-        fetchQuizzes();
+        const auth = getAuth(app);
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchQuizzes(user.uid);
+            } else {
+                setLoading(false);
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
 
     if (loading) {

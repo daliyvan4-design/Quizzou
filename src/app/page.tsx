@@ -65,15 +65,14 @@ export default function Home() {
             <Link className="text-sm font-medium hover:text-primary transition-colors" href="/pricing">Tarifs</Link>
             <Link className="text-sm font-medium hover:text-primary transition-colors" href="/contact">Contact</Link>
           </nav>
-          <button onClick={handleLogin} disabled={isLoggingIn} className="flex items-center gap-2 bg-primary text-white border-2 border-primary px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:bg-white hover:text-primary transition-colors disabled:opacity-50">
-            <img alt="Google logo icon" className="w-5 h-5 bg-white rounded-full p-0.5 border border-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACqGchdvjAlDkVxSp_XsSrjhyWZNkEsV7oMMcyP9gw3ZcxOXt9GRGS09u0AuydzmNejXMTsxHhbpbUsIOboZbunId3afpI2rw_N2lXssSdyNVs624sAvyT-qP_6uDGXRbnu8taVOjnukyVge5BAvmWJAqA2TVOaFqQe8Yn2BHdFBYq37KBc03n-tX5jj27ENJrN1DSCph1jtVN_strPYHhLq1CIWSzkigBFQYFHElv4drjqpS0j1uzqkI86LsfuPFxGYon-ZuutDQ5" />
+          <button onClick={handleLogin} disabled={isLoggingIn} className="flex items-center gap-2 bg-primary text-white border-2 border-primary px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:bg-white hover:text-primary transition-all hover:scale-105 active:scale-95 disabled:opacity-50">
             {isLoggingIn ? "Patientez..." : "Se connecter"}
           </button>
         </div>
       </header>
 
       <main className="flex-grow pt-32">
-        <section className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-32">
+        <section className="opacity-0 animate-fade-in-up max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-32">
           <div className="flex flex-col gap-8 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 bg-primary text-white px-3 py-1 rounded-full w-fit mx-auto lg:mx-0">
               <span className="material-symbols-outlined text-sm">bolt</span>
@@ -88,14 +87,13 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <button onClick={handleLogin} disabled={isLoggingIn} className="flex items-center justify-center gap-3 bg-primary text-white border-2 border-primary px-8 py-4 rounded-xl text-lg font-bold shadow-xl shadow-primary/20 hover:bg-white hover:text-primary transition-colors cursor-pointer disabled:opacity-50">
-                <img alt="Google logo icon" className="w-6 h-6 bg-white rounded-full p-1 border border-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACqGchdvjAlDkVxSp_XsSrjhyWZNkEsV7oMMcyP9gw3ZcxOXt9GRGS09u0AuydzmNejXMTsxHhbpbUsIOboZbunId3afpI2rw_N2lXssSdyNVs624sAvyT-qP_6uDGXRbnu8taVOjnukyVge5BAvmWJAqA2TVOaFqQe8Yn2BHdFBYq37KBc03n-tX5jj27ENJrN1DSCph1jtVN_strPYHhLq1CIWSzkigBFQYFHElv4drjqpS0j1uzqkI86LsfuPFxGYon-ZuutDQ5" />
+              <button onClick={handleLogin} disabled={isLoggingIn} className="flex items-center justify-center gap-3 bg-primary text-white border-2 border-primary px-8 py-4 rounded-xl text-lg font-bold shadow-xl shadow-primary/20 hover:bg-white hover:text-primary transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50">
                 {isLoggingIn ? "Connexion..." : "Continuer avec Google"}
               </button>
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-sm lg:max-w-full">
+          <div className="relative mx-auto w-full max-w-sm lg:max-w-full animate-float">
             <div className="relative glass-card bg-white border-2 border-primary rounded-3xl overflow-hidden shadow-2xl">
               <div className="p-4 aspect-video flex items-center justify-center">
                 <div className="w-full h-full border-2 border-dashed border-primary rounded-2xl flex flex-col items-center justify-center gap-4">
@@ -112,7 +110,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-6 py-24 border-t-2 border-primary">
+        <section className="opacity-0 animate-fade-in-up max-w-7xl mx-auto px-6 py-24 border-t-2 border-primary" style={{ animationDelay: '200ms' }}>
           <div className="text-center mb-16">
             <h2 className="text-3xl font-extrabold text-black mb-4">L'apprentissage réinventé</h2>
             <p className="text-black max-w-2xl mx-auto italic font-medium">Une approche scientifique pour une mémorisation durable et sans effort.</p>
