@@ -42,7 +42,7 @@ export default function Home() {
       } else {
         const errorData = await res.json();
         console.error("Session creation failed", errorData);
-        alert(`Erreur création session: ${errorData.error || "Inconnue"}\nVérifiez les variables FIREBASE_ADMIN sur Vercel.`);
+        alert(`Erreur création session: ${errorData.error || "Inconnue"}\nDebug: ${errorData.debug}\nVérifiez les variables FIREBASE_ADMIN sur Vercel.`);
         setIsLoggingIn(false);
       }
     } catch (error) {

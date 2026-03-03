@@ -21,6 +21,14 @@ export async function POST(request: Request) {
         return NextResponse.json({ status: 'success' }, { status: 200 });
     } catch (error: any) {
         console.error("Erreur serveur auth/session:", error);
-        return NextResponse.json({ error: error.message }, { status: 401 });
+
+        const keyExists = !!process.env.FIREBASE_PRIVATE_KEY;
+        const emailExists = !!process.env.FIREBASE_CLIENT_EMAIL;
+        const projectExists = !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+
+        return NextResponse.json({
+            error: error.message,
+            debug: `Key=${keyExists}, Email=${emailExists}, Project=${projectExists}`
+        }, { status: 401 });
     }
 }
