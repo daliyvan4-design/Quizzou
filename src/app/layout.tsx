@@ -10,6 +10,26 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Quizzou - Ne lisez plus. Maîtrisez.",
   description: "Transformez instantanément n'importe quel cours en quiz interactif.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
+  openGraph: {
+    title: "Quizzou - Ne lisez plus. Maîtrisez.",
+    description: "Transformez instantanément n'importe quel cours en quiz interactif.",
+    url: "https://quizzou.vercel.app",
+    siteName: "Quizzou",
+    images: [
+      {
+        url: "/quizzou.jpeg", // Must be an absolute URL in production, but root relative works for Vercel
+        width: 1200,
+        height: 630,
+        alt: "Quizzou Logo",
+      },
+    ],
+    locale: "fr_FR",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
