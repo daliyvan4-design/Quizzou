@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithPopup, signInWithRedirect, getRedirectResult, browserPopupRedirectResolver } from "firebase/auth";
+import { signInWithPopup, signInWithRedirect, getRedirectResult, browserPopupRedirectResolver, onAuthStateChanged } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase/config";
 import { useEffect } from "react";
 
@@ -25,7 +25,7 @@ export default function Home() {
 
       if (res.ok) {
         console.log("Session created successfully, redirecting...");
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       } else {
         const errorData = await res.json();
         console.error("Session creation failed", errorData);
@@ -39,6 +39,15 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // Check if user is already logged in (persistence)
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && !isLoggingIn) {
+        // If user is already there but we don't have a session, try to create one or redirect
+        // This helps on mobile if the redirect result was lost but the user is signed in
+        console.log("onAuthStateChanged: User detected", user.email);
+      }
+    });
+
     const handleRedirect = async () => {
       try {
         console.log("Checking for redirect result...");
@@ -58,6 +67,7 @@ export default function Home() {
       }
     };
     handleRedirect();
+    return () => unsubscribe();
   }, []);
 
   const handleLogin = async () => {
