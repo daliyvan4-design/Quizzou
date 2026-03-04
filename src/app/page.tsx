@@ -4,34 +4,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithPopup, browserPopupRedirectResolver } from "firebase/auth";
+import { signInWithPopup, signInWithRedirect, getRedirectResult, browserPopupRedirectResolver } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase/config";
+import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleLogin = async () => {
+  const createSession = async (user: any) => {
     try {
-      setIsLoggingIn(true);
-
-      const apiKey = auth.app.options.apiKey;
-      console.log("Auto-diagnostic Auth...");
-
-      if (!apiKey || apiKey.includes("Placeholder")) {
-        alert("⚠️ Erreur de configuration : Le site utilise une clé de secours. Vérifiez vos variables d'environnement NEXT_PUBLIC_ sur Vercel !");
-        setIsLoggingIn(false);
-        return;
-      }
-
-      // Log pour vérifier que les variables sont bien chargées côté client
-      console.log("Tentative de connexion...");
-      console.log("Firebase App Name:", auth.app.name);
-
-      const result = await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
-      const idToken = await result.user.getIdToken();
-
+      const idToken = await user.getIdToken();
       const res = await fetch("/api/auth/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -46,12 +30,64 @@ export default function Home() {
         alert(`Erreur création session: ${errorData.error || "Inconnue"}\nDebug: ${errorData.debug}\nVérifiez les variables FIREBASE_ADMIN sur Vercel.`);
         setIsLoggingIn(false);
       }
+    } catch (err) {
+      console.error("Session Error", err);
+      setIsLoggingIn(false);
+    }
+  };
+
+  useEffect(() => {
+    // Check if we back from a redirect login
+    const handleRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          setIsLoggingIn(true);
+          await createSession(result.user);
+        }
+      } catch (error) {
+        console.error("Error with redirect login:", error);
+      }
+    };
+    handleRedirect();
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      setIsLoggingIn(true);
+      const apiKey = auth.app.options.apiKey;
+
+      if (!apiKey || apiKey.includes("Placeholder")) {
+        alert("⚠️ Erreur de configuration : Le site utilise une clé de secours.");
+        setIsLoggingIn(false);
+        return;
+      }
+
+      // Check if user is on mobile
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        await signInWithRedirect(auth, googleProvider);
+        return;
+      }
+
+      try {
+        const result = await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
+        await createSession(result.user);
+      } catch (popupError: any) {
+        if (popupError.code === "auth/popup-blocked") {
+          console.log("Popup blocked, trying redirect...");
+          await signInWithRedirect(auth, googleProvider);
+        } else {
+          throw popupError;
+        }
+      }
     } catch (error: any) {
       console.error("Firebase Login Error", error);
       if (error?.code === "auth/unauthorized-domain") {
         const currentDomain = typeof window !== "undefined" ? window.location.hostname : "Inconnu";
-        alert(`Erreur de domaine non autorisé.\n\n👉 Vous devez aller dans Firebase > Authentication > Settings > Authorized Domains et ajouter : \n${currentDomain}`);
-      } else {
+        alert(`Erreur de domaine non autorisé.\n\n👉 Allez dans Firebase > Authentication > Settings > Authorized Domains et ajoutez : \n${currentDomain}`);
+      } else if (error?.code !== "auth/popup-closed-by-user" && error?.code !== "auth/cancelled-popup-request") {
         alert(`Erreur de connexion: ${error?.message || "Une erreur inconnue est survenue."}`);
       }
       setIsLoggingIn(false);
