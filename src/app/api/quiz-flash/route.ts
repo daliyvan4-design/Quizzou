@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
         const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY });
         const response = await ai.models.generateContent({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-1.5-flash',
             contents: `Tu es un professeur expert d'université. Génère un quiz interactif très complet de niveau avancé sur le thème ou sujet suivant : "${topic}".
         Je veux au minimum entre 5 et 10 questions. Veille à ce que les questions évaluent la compréhension profonde, le raisonnement et l'analyse de ce thème.
         IMPORTANT: Le quiz en entier (titre, questions, options, explications, tags) DOIT ABSOLUMENT T'ÊTRE RÉDIGÉ EN FRANÇAIS.

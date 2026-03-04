@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
         const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY });
         const response = await ai.models.generateContent({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-1.5-flash',
             contents: `Tu es un expert en éducation. Ton but est de créer un résumé structuré, clair et ultra-pertinent du texte suivant.
         Utilise des titres (Markdown), des puces, et mets en gras les concepts clés.
         Rédige le tout en FRANÇAIS.
