@@ -15,6 +15,7 @@ export default function Home() {
 
   const createSession = async (user: any) => {
     try {
+      console.log("Creating session for user:", user.email);
       const idToken = await user.getIdToken();
       const res = await fetch("/api/auth/session", {
         method: "POST",
@@ -23,11 +24,12 @@ export default function Home() {
       });
 
       if (res.ok) {
+        console.log("Session created successfully, redirecting...");
         router.push("/dashboard");
       } else {
         const errorData = await res.json();
         console.error("Session creation failed", errorData);
-        alert(`Erreur création session: ${errorData.error || "Inconnue"}\nDebug: ${errorData.debug}\nVérifiez les variables FIREBASE_ADMIN sur Vercel.`);
+        alert(`Erreur création session: ${errorData.error || "Inconnue"}`);
         setIsLoggingIn(false);
       }
     } catch (err) {
@@ -37,16 +39,22 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Check if we back from a redirect login
     const handleRedirect = async () => {
       try {
+        console.log("Checking for redirect result...");
         const result = await getRedirectResult(auth);
         if (result?.user) {
+          console.log("Redirect result found user:", result.user.email);
           setIsLoggingIn(true);
           await createSession(result.user);
+        } else {
+          console.log("No redirect result found.");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error with redirect login:", error);
+        if (error.code !== "auth/popup-closed-by-user") {
+          alert("Erreur de redirection: " + error.message);
+        }
       }
     };
     handleRedirect();
@@ -55,6 +63,7 @@ export default function Home() {
   const handleLogin = async () => {
     try {
       setIsLoggingIn(true);
+      console.log("Starting login flow...");
       const apiKey = auth.app.options.apiKey;
 
       if (!apiKey || apiKey.includes("Placeholder")) {
@@ -63,20 +72,23 @@ export default function Home() {
         return;
       }
 
-      // Check if user is on mobile
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      console.log("Is Mobile:", isMobile);
 
       if (isMobile) {
+        console.log("Mobile detected, using redirect...");
         await signInWithRedirect(auth, googleProvider);
         return;
       }
 
       try {
+        console.log("Trying popup...");
         const result = await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
+        console.log("Popup success, user:", result.user.email);
         await createSession(result.user);
       } catch (popupError: any) {
         if (popupError.code === "auth/popup-blocked") {
-          console.log("Popup blocked, trying redirect...");
+          console.log("Popup blocked, fallback to redirect...");
           await signInWithRedirect(auth, googleProvider);
         } else {
           throw popupError;
@@ -84,10 +96,7 @@ export default function Home() {
       }
     } catch (error: any) {
       console.error("Firebase Login Error", error);
-      if (error?.code === "auth/unauthorized-domain") {
-        const currentDomain = typeof window !== "undefined" ? window.location.hostname : "Inconnu";
-        alert(`Erreur de domaine non autorisé.\n\n👉 Allez dans Firebase > Authentication > Settings > Authorized Domains et ajoutez : \n${currentDomain}`);
-      } else if (error?.code !== "auth/popup-closed-by-user" && error?.code !== "auth/cancelled-popup-request") {
+      if (error?.code !== "auth/popup-closed-by-user" && error?.code !== "auth/cancelled-popup-request") {
         alert(`Erreur de connexion: ${error?.message || "Une erreur inconnue est survenue."}`);
       }
       setIsLoggingIn(false);
@@ -96,6 +105,13 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-white text-black">
+      {/* Page Loader */}
+      {isLoggingIn && (
+        <div className="fixed inset-0 z-[100] bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="font-black text-primary animate-pulse tracking-widest uppercase text-sm">Quizzou vous connecte...</p>
+        </div>
+      )}
       <header className="fixed top-0 w-full z-50 glass-header">
         <div className="max-w-7xl mx-auto px-6 h-20 md:h-24 flex items-center justify-between">
           <div className="flex items-center">
