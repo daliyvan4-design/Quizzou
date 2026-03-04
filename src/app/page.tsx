@@ -96,7 +96,10 @@ export default function Home() {
       }
     } catch (error: any) {
       console.error("Firebase Login Error", error);
-      if (error?.code !== "auth/popup-closed-by-user" && error?.code !== "auth/cancelled-popup-request") {
+      if (error?.code === "auth/unauthorized-domain") {
+        const currentDomain = typeof window !== "undefined" ? window.location.hostname : "Inconnu";
+        alert(`Erreur de domaine non autorisé.\n\n👉 Allez dans Firebase > Authentication > Settings > Authorized Domains et ajoutez : \n${currentDomain}`);
+      } else if (error?.code !== "auth/popup-closed-by-user" && error?.code !== "auth/cancelled-popup-request") {
         alert(`Erreur de connexion: ${error?.message || "Une erreur inconnue est survenue."}`);
       }
       setIsLoggingIn(false);
