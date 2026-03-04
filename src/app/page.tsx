@@ -39,12 +39,23 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Check if user is already logged in (persistence)
+    // Check if we have an auth_hint cookie
+    const hasAuthHint = typeof document !== 'undefined' && document.cookie.includes('auth_hint=true');
+
+    // Persistence listener: bridge Firebase auth with server session
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user && !isLoggingIn) {
-        // If user is already there but we don't have a session, try to create one or redirect
-        // This helps on mobile if the redirect result was lost but the user is signed in
+      if (user) {
         console.log("onAuthStateChanged: User detected", user.email);
+        // If we have a Firebase user but NO auth_hint cookie, bridge the session!
+        if (!hasAuthHint && !isLoggingIn) {
+          console.log("Bridging session automatically...");
+          setIsLoggingIn(true);
+          await createSession(user);
+        } else if (hasAuthHint) {
+          // We have both, but maybe we are stuck on landing. Force redirect to dashboard.
+          console.log("Auth hint found, pushing to dashboard...");
+          window.location.replace("/dashboard");
+        }
       }
     });
 
@@ -56,16 +67,16 @@ export default function Home() {
           console.log("Redirect result found user:", result.user.email);
           setIsLoggingIn(true);
           await createSession(result.user);
-        } else {
-          console.log("No redirect result found.");
         }
       } catch (error: any) {
         console.error("Error with redirect login:", error);
         if (error.code !== "auth/popup-closed-by-user") {
           alert("Erreur de redirection: " + error.message);
+          setIsLoggingIn(false);
         }
       }
     };
+
     handleRedirect();
     return () => unsubscribe();
   }, []);

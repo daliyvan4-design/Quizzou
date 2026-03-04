@@ -19,6 +19,15 @@ export async function POST(request: Request) {
             path: '/'
         });
 
+        // Add a non-httpOnly hint for the client
+        cookieStore.set('auth_hint', 'true', {
+            maxAge: expiresIn / 1000,
+            httpOnly: false, // Accessible by JS
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/'
+        });
+
         return NextResponse.json({ status: 'success' }, { status: 200 });
     } catch (error: any) {
         console.error("Erreur serveur auth/session:", error);
