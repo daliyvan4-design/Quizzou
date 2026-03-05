@@ -5,10 +5,9 @@ export function middleware(request: NextRequest) {
     const session = request.cookies.get('session');
 
     // Si l'utilisateur n'est pas connecté et qu'il essaye d'accéder à des pages protégées
-    // On retire /dashboard de la redirection forcée par middleware pour laisser le client-side gérer la persistance plus souplement
+    // Dashboard gère sa propre protection client-side pour plus de résilience sur mobile.
     const isProtectedRoute =
         request.nextUrl.pathname.startsWith('/quiz/') ||
-        request.nextUrl.pathname.startsWith('/processing') ||
         request.nextUrl.pathname.startsWith('/results');
 
     if (!session && isProtectedRoute) {
@@ -17,17 +16,7 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(url);
     }
 
-    // Si on est connecté et qu'on essaie d'aller sur la page d'accueil (ou auth)
-    const isAuthRoute = request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/auth');
-    if (session && isAuthRoute) {
-        if (request.nextUrl.pathname === '/auth/callback') {
-            // on laisse le callback passer
-            return NextResponse.next();
-        }
-        const url = request.nextUrl.clone();
-        url.pathname = '/dashboard';
-        return NextResponse.redirect(url);
-    }
+    return NextResponse.next();
 
     return NextResponse.next();
 }

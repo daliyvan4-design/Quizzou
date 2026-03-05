@@ -13,10 +13,16 @@ export default function Home() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isInAppBrowser, setIsInAppBrowser] = useState(false);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+
+  const logDebug = (msg: string) => {
+    console.log(`[DEBUG] ${msg}`);
+    setDebugLogs(prev => [...prev.slice(-9), `${new Date().toLocaleTimeString()} - ${msg}`]);
+  };
 
   const createSession = async (user: any) => {
     try {
-      console.log("Creating session for user:", user.email);
+      logDebug("Création session pour: " + user.email);
       const idToken = await user.getIdToken();
       const res = await fetch("/api/auth/session", {
         method: "POST",
@@ -25,7 +31,7 @@ export default function Home() {
       });
 
       if (res.ok) {
-        console.log("Session created successfully, redirecting...");
+        logDebug("Session créée ! Redirection...");
         window.location.href = "/dashboard";
       } else {
         const errorData = await res.json();
@@ -55,25 +61,23 @@ export default function Home() {
     // Persistence listener: bridge Firebase auth with server session
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        console.log("onAuthStateChanged: User detected", user.email);
+        logDebug("Auth détecté: " + user.email);
 
         // If we have a Firebase user but NO auth_hint cookie, bridge the session!
         if (!hasAuthHint && !isLoggingIn) {
-          console.log("Bridging session automatically...");
+          logDebug("Pontage de session auto...");
           setIsLoggingIn(true);
           await createSession(user);
         } else if (hasAuthHint) {
-          // We have both, but maybe we are stuck on landing. Force redirect to dashboard.
-          console.log("Auth hint found, pushing to dashboard...");
-          // Small delay to ensure the cookie is processed by the browser
+          logDebug("Hint trouvé, redirection forcée...");
           setTimeout(() => {
             window.location.replace("/dashboard");
-          }, 500);
+          }, 800);
         }
       } else {
-        // If no user but hint exists, it might be an expired firebase session
-        // Clear the hint to avoid getting stuck in "loading" states
+        logDebug("Aucun utilisateur Firebase détecté.");
         if (hasAuthHint) {
+          logDebug("Nettoyage hint expiré.");
           document.cookie = "auth_hint=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         }
       }
@@ -104,7 +108,7 @@ export default function Home() {
   const handleLogin = async () => {
     try {
       setIsLoggingIn(true);
-      console.log("Starting login flow...");
+      logDebug("Début du flux de connexion...");
       const apiKey = auth.app.options.apiKey;
 
       if (!apiKey || apiKey.includes("Placeholder")) {
@@ -114,29 +118,23 @@ export default function Home() {
       }
 
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      console.log("Is Mobile:", isMobile);
-
-      if (isMobile) {
-        console.log("Mobile detected, using redirect...");
-        await signInWithRedirect(auth, googleProvider);
-        return;
-      }
 
       try {
-        console.log("Trying popup...");
+        logDebug("Tentative de Popup...");
         const result = await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
-        console.log("Popup success, user:", result.user.email);
+        logDebug("Succès Popup !");
         await createSession(result.user);
       } catch (popupError: any) {
-        if (popupError.code === "auth/popup-blocked") {
-          console.log("Popup blocked, fallback to redirect...");
+        logDebug("Popup échoué ou bloqué: " + (popupError.code || "erreur unknown"));
+        if (popupError.code === "auth/popup-blocked" || isMobile || popupError.code === "auth/cancelled-popup-request" || popupError.code === "auth/popup-closed-by-user") {
+          logDebug("Fallback vers Redirect...");
           await signInWithRedirect(auth, googleProvider);
         } else {
           throw popupError;
         }
       }
     } catch (error: any) {
-      console.error("Firebase Login Error", error);
+      logDebug("Erreur Finale: " + error.code);
       if (error?.code === "auth/unauthorized-domain") {
         const currentDomain = typeof window !== "undefined" ? window.location.hostname : "Inconnu";
         alert(`Erreur de domaine non autorisé.\n\n👉 Allez dans Firebase > Authentication > Settings > Authorized Domains et ajoutez : \n${currentDomain}`);
@@ -287,6 +285,16 @@ export default function Home() {
           <p className="text-sm font-bold text-slate-500">© 2026 Xcompany all right reserved.</p>
         </div>
       </footer>
+
+      {/* Debug Journal Layer */}
+      <div className="fixed bottom-4 right-4 z-[200] max-w-xs w-full pointer-events-none">
+        <div className="bg-black/90 text-[10px] text-green-400 font-mono p-3 rounded-lg border border-green-500/30 shadow-2xl overflow-hidden opacity-60">
+          <p className="border-b border-green-500/20 pb-1 mb-1 font-bold uppercase">Journal de Connexion</p>
+          {debugLogs.map((log, i) => (
+            <p key={i} className="leading-tight mb-0.5">{log}</p>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

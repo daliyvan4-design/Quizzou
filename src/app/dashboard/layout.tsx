@@ -15,14 +15,18 @@ export default function DashboardLayout({
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [searchQuery, setSearchQuery] = useState("");
+    const [isHealing, setIsHealing] = useState(false);
+    const [isAuthSlow, setIsAuthSlow] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         const auth = getAuth(app);
 
         let redirectTimeout: NodeJS.Timeout;
+        let slowAuthTimeout: NodeJS.Timeout;
 
         const createSession = async (firebaseUser: any) => {
+            setIsHealing(true);
             try {
                 const idToken = await firebaseUser.getIdToken();
                 await fetch("/api/auth/session", {
@@ -33,13 +37,17 @@ export default function DashboardLayout({
                 console.log("Session healed/synced from dashboard.");
             } catch (err) {
                 console.error("Dashboard session sync error", err);
+            } finally {
+                setIsHealing(false);
             }
         };
 
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
                 setUser(currentUser);
+                setIsAuthSlow(false);
                 if (redirectTimeout) clearTimeout(redirectTimeout);
+                if (slowAuthTimeout) clearTimeout(slowAuthTimeout);
 
                 // Session Bridging / Rescue
                 const hasAuthHint = typeof document !== 'undefined' && document.cookie.includes('auth_hint=true');
@@ -48,19 +56,24 @@ export default function DashboardLayout({
                     await createSession(currentUser);
                 }
             } else {
-                // If after 3 seconds we still have no Firebase user, and no session hint, redirect to login
+                // Patience logic for mobile
+                slowAuthTimeout = setTimeout(() => {
+                    setIsAuthSlow(true);
+                }, 4000);
+
                 const hasAuthHint = typeof document !== 'undefined' && document.cookie.includes('auth_hint=true');
                 if (!hasAuthHint) {
                     redirectTimeout = setTimeout(() => {
-                        console.log("No user/session detected after timeout, redirecting to home.");
+                        console.log("No user detected after 12s, redirecting.");
                         window.location.href = "/";
-                    }, 3000);
+                    }, 12000);
                 }
             }
         });
         return () => {
             unsubscribe();
             if (redirectTimeout) clearTimeout(redirectTimeout);
+            if (slowAuthTimeout) clearTimeout(slowAuthTimeout);
         };
     }, []);
 
@@ -78,6 +91,27 @@ export default function DashboardLayout({
 
     return (
         <div className="flex h-screen overflow-hidden bg-white text-black">
+            {/* Authentication Recovery Overlay */}
+            {(isAuthSlow || isHealing) && (
+                <div className="fixed inset-0 z-[100] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center gap-6 p-8 text-center animate-fade-in">
+                    <div className="relative">
+                        <div className="w-16 h-16 border-4 border-primary/20 rounded-full"></div>
+                        <div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <div className="flex flex-col gap-2 max-w-sm">
+                        <h2 className="text-2xl font-black text-black">
+                            {isHealing ? "Connexion sécurisée..." : "Récupération de session..."}
+                        </h2>
+                        <p className="text-primary font-bold animate-pulse text-sm uppercase tracking-widest">
+                            {isHealing ? "Synchronisation avec le serveur" : "Connexion à vos données"}
+                        </p>
+                        <p className="text-black/50 text-xs mt-4">
+                            Les navigateurs mobiles (Safari) peuvent ralentir la connexion. Patientez quelques secondes.
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {/* Mobile Header (Hamburger) */}
             <div className="md:hidden fixed top-0 w-full bg-white border-b-2 border-primary z-50 flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
