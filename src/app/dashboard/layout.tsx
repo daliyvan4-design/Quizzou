@@ -19,10 +19,49 @@ export default function DashboardLayout({
 
     useEffect(() => {
         const auth = getAuth(app);
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
+
+        let redirectTimeout: NodeJS.Timeout;
+
+        const createSession = async (firebaseUser: any) => {
+            try {
+                const idToken = await firebaseUser.getIdToken();
+                await fetch("/api/auth/session", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ idToken }),
+                });
+                console.log("Session healed/synced from dashboard.");
+            } catch (err) {
+                console.error("Dashboard session sync error", err);
+            }
+        };
+
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                setUser(currentUser);
+                if (redirectTimeout) clearTimeout(redirectTimeout);
+
+                // Session Bridging / Rescue
+                const hasAuthHint = typeof document !== 'undefined' && document.cookie.includes('auth_hint=true');
+                if (!hasAuthHint) {
+                    console.log("Dashboard: No auth hint found, healing session...");
+                    await createSession(currentUser);
+                }
+            } else {
+                // If after 3 seconds we still have no Firebase user, and no session hint, redirect to login
+                const hasAuthHint = typeof document !== 'undefined' && document.cookie.includes('auth_hint=true');
+                if (!hasAuthHint) {
+                    redirectTimeout = setTimeout(() => {
+                        console.log("No user/session detected after timeout, redirecting to home.");
+                        window.location.href = "/";
+                    }, 3000);
+                }
+            }
         });
-        return () => unsubscribe();
+        return () => {
+            unsubscribe();
+            if (redirectTimeout) clearTimeout(redirectTimeout);
+        };
     }, []);
 
     const handleSignOut = async () => {

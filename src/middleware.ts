@@ -5,8 +5,9 @@ export function middleware(request: NextRequest) {
     const session = request.cookies.get('session');
 
     // Si l'utilisateur n'est pas connecté et qu'il essaye d'accéder à des pages protégées
-    const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') ||
-        request.nextUrl.pathname.startsWith('/quiz') ||
+    // On retire /dashboard de la redirection forcée par middleware pour laisser le client-side gérer la persistance plus souplement
+    const isProtectedRoute =
+        request.nextUrl.pathname.startsWith('/quiz/') ||
         request.nextUrl.pathname.startsWith('/processing') ||
         request.nextUrl.pathname.startsWith('/results');
 
