@@ -12,6 +12,7 @@ export default function Home() {
   const router = useRouter();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isInAppBrowser, setIsInAppBrowser] = useState(false);
 
   const createSession = async (user: any) => {
     try {
@@ -39,6 +40,15 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // Detect In-App browsers (Instagram, Facebook, etc.)
+    const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
+    const isFacebook = ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1;
+    const isInstagram = ua.indexOf("Instagram") > -1;
+    const isThreads = ua.indexOf("Threads") > -1;
+    if (isFacebook || isInstagram || isThreads) {
+      setIsInAppBrowser(true);
+    }
+
     // Check if we have an auth_hint cookie
     const hasAuthHint = typeof document !== 'undefined' && document.cookie.includes('auth_hint=true');
 
@@ -46,6 +56,7 @@ export default function Home() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         console.log("onAuthStateChanged: User detected", user.email);
+
         // If we have a Firebase user but NO auth_hint cookie, bridge the session!
         if (!hasAuthHint && !isLoggingIn) {
           console.log("Bridging session automatically...");
@@ -54,7 +65,16 @@ export default function Home() {
         } else if (hasAuthHint) {
           // We have both, but maybe we are stuck on landing. Force redirect to dashboard.
           console.log("Auth hint found, pushing to dashboard...");
-          window.location.replace("/dashboard");
+          // Small delay to ensure the cookie is processed by the browser
+          setTimeout(() => {
+            window.location.replace("/dashboard");
+          }, 500);
+        }
+      } else {
+        // If no user but hint exists, it might be an expired firebase session
+        // Clear the hint to avoid getting stuck in "loading" states
+        if (hasAuthHint) {
+          document.cookie = "auth_hint=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         }
       }
     });
@@ -79,7 +99,7 @@ export default function Home() {
 
     handleRedirect();
     return () => unsubscribe();
-  }, []);
+  }, [isLoggingIn]);
 
   const handleLogin = async () => {
     try {
@@ -136,6 +156,22 @@ export default function Home() {
           <p className="font-black text-primary animate-pulse tracking-widest uppercase text-sm">Quizzou vous connecte...</p>
         </div>
       )}
+
+      {/* In-App Browser Warning */}
+      {isInAppBrowser && (
+        <div className="fixed top-0 left-0 w-full z-[110] bg-amber-500 text-white px-6 py-4 flex flex-col items-center justify-center text-center gap-2 shadow-xl border-b-2 border-amber-600">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined font-black">warning</span>
+            <p className="font-black uppercase tracking-tight">Navigateur non-sécurisé détecté</p>
+          </div>
+          <p className="text-sm font-bold">
+            Google bloque la connexion depuis Instagram/Facebook/WhatsApp. <br />
+            Cliquez sur les <span className="underline">...</span> en haut à droite et choisissez
+            <span className="bg-white text-amber-500 px-2 py-0.5 rounded-md mx-1">Ouvrir dans Safari</span> ou Chrome.
+          </p>
+        </div>
+      )}
+
       <header className="fixed top-0 w-full z-50 glass-header">
         <div className="max-w-7xl mx-auto px-6 h-20 md:h-24 flex items-center justify-between">
           <div className="flex items-center">
