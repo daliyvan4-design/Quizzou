@@ -178,11 +178,13 @@ export default function Home() {
           <nav className="hidden md:flex items-center gap-8">
             <Link className="text-sm font-bold hover:text-primary transition-colors" href="/features">Fonctionnalités</Link>
             <Link className="text-sm font-bold hover:text-primary transition-colors" href="/pricing">Tarifs</Link>
-            <Link className="text-sm font-bold hover:text-primary transition-colors" href="/contact">Contact</Link>
+            <button onClick={handleLogin} disabled={isLoggingIn} className="text-sm font-bold hover:text-primary transition-colors">
+              Connexion
+            </button>
           </nav>
           <div className="flex items-center gap-4">
             <button onClick={handleLogin} disabled={isLoggingIn} className="hidden md:flex items-center gap-2 bg-primary text-white border-2 border-primary px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:bg-white hover:text-primary transition-all hover:scale-105 active:scale-95 disabled:opacity-50">
-              {isLoggingIn ? "Patientez..." : "Se connecter"}
+              {isLoggingIn ? "Patientez..." : "S'inscrire gratuitement"}
             </button>
             <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-primary p-2">
               <span className="material-symbols-outlined text-3xl">menu</span>
@@ -200,10 +202,12 @@ export default function Home() {
           <nav className="flex flex-col gap-6 items-center text-center w-full mb-8">
             <Link onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-black text-black hover:text-primary transition-colors" href="/features">Fonctionnalités</Link>
             <Link onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-black text-black hover:text-primary transition-colors" href="/pricing">Tarifs</Link>
-            <Link onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-black text-black hover:text-primary transition-colors" href="/contact">Contact</Link>
+            <button onClick={() => { setIsMobileMenuOpen(false); handleLogin(); }} disabled={isLoggingIn} className="text-xl font-black text-black hover:text-primary transition-colors">
+              Se connecter
+            </button>
           </nav>
           <button onClick={() => { setIsMobileMenuOpen(false); handleLogin(); }} disabled={isLoggingIn} className="flex justify-center items-center gap-2 bg-primary text-white border-2 border-primary px-8 py-4 rounded-xl text-lg font-bold shadow-lg w-full transition-all active:scale-95 disabled:opacity-50">
-            {isLoggingIn ? "Patientez..." : "Se connecter avec Google"}
+            {isLoggingIn ? "Patientez..." : "Commencer gratuitement"}
           </button>
         </div>
       )}
@@ -225,9 +229,12 @@ export default function Home() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <button onClick={handleLogin} disabled={isLoggingIn} className="flex items-center justify-center gap-3 bg-primary text-white border-2 border-primary px-8 py-4 rounded-xl text-lg font-bold shadow-xl shadow-primary/20 hover:bg-white hover:text-primary transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50">
-                {isLoggingIn ? "Connexion..." : "Continuer avec Google"}
+                {isLoggingIn ? "Connexion..." : "Commencer gratuitement"}
               </button>
             </div>
+            <p className="text-[10px] text-black/40 font-bold uppercase tracking-widest mt-[-20px] lg:text-left text-center">
+              Compte gratuit à vie • Pas de carte requise
+            </p>
           </div>
 
           <div className="relative mx-auto w-full max-w-sm lg:max-w-full animate-float">
